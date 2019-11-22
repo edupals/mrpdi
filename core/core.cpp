@@ -17,8 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core.h"
-#include "BaseDriver.h"
+#include "core.hpp"
+#include "basedriver.hpp"
 
 #include <libusb-1.0/libusb.h>
 

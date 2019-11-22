@@ -17,9 +17,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "input.h"
-#include "core.h"
-#include "utils.h"
+#include "input.hpp"
+#include "core.hpp"
+#include "utils.hpp"
 
 #include <linux/uinput.h>
 #include <linux/input.h>

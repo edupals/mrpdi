@@ -20,7 +20,7 @@
 #ifndef MRPDI_INPUT
 #define MRPDI_INPUT
 
-#include "basedriver.h"
+#include "basedriver.hpp"
 
 #include <linux/uinput.h>
 #include <linux/input.h>

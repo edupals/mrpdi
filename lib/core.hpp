@@ -20,8 +20,8 @@
 #ifndef MRPDI_CORE
 #define MRPDI_CORE
 
-#include "Input.h"
-#include "Driver.h"
+#include "input.hpp"
+#include "driver.hpp"
 
 #include <vector>
 #include <string>
@@ -69,9 +69,9 @@ namespace lliurex
             input::BaseInputHandler * get_input_handler();
             
             void update_devices(std::vector<connected_device_info> * out_list);
-            void get_parameter_list(unsigned int id,std::vector<string> * out_list);
+            void get_parameter_list(unsigned int id,std::vector<std::string> * out_list);
             
-            string get_device_name(unsigned int id);
+            std::string get_device_name(unsigned int id);
             
             void start(unsigned int id,unsigned int address);
             void stop(unsigned int id,unsigned int address);

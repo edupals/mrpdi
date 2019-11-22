@@ -20,7 +20,7 @@
 #ifndef MRPDI_UTILS
 #define MRPDI_UTILS
 
-#include "basedriver.h"
+#include "basedriver.hpp"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

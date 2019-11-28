@@ -1,3 +1,5 @@
+include_directories(${CMAKE_SOURCE_DIR}/lib)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBCONFIGCPP REQUIRED IMPORTED_TARGET "libconfig++")
 

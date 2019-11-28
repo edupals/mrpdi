@@ -17,9 +17,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../lib/core.hpp"
-#include "../lib/input.hpp"
-#include "../lib/basedriver.hpp"
+#include <core.hpp>
+#include <input.hpp>
+#include <basedriver.hpp>
 
 #include <libconfig.h++>
 

@@ -19,3 +19,5 @@ set_source_files_properties(gresources.c PROPERTIES GENERATED TRUE)
 
 add_executable(mrpdi-gui main.cpp gresources.c)
 target_link_libraries(mrpdi-gui mrpdi PkgConfig::LIBCONFIGCPP PkgConfig::GTKMM PkgConfig::GIOMM PkgConfig::GLIBMM PkgConfig::APPINDICATOR)
+
+install(TARGETS mrpdi-gui RUNTIME DESTINATION bin)

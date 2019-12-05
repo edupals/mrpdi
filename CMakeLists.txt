@@ -9,11 +9,14 @@ add_subdirectory(drivers)
 #desktop
 install(
     FILES ${CMAKE_CURRENT_SOURCE_DIR}/desktop/mrpdi.desktop
-    DESTINATION usr/share/applications/
+    DESTINATION share/applications/
 )
 
 #icon
 install(
     FILES ${CMAKE_CURRENT_SOURCE_DIR}/desktop/mrpdi.svg
-    DESTINATION usr/share/icons/hicolor/scalable/apps/
+    DESTINATION share/icons/hicolor/scalable/apps/
 )
+
+#settings directory
+install(DIRECTORY DESTINATION /etc/mrpdi)

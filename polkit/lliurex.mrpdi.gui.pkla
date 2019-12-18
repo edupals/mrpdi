@@ -1,0 +1,8 @@
+[/usr/bin/mrpdi-gui]
+Identity=unix-group:teachers;unix-group:sudo;
+Action=lliurex.mrpdi.gui
+ResultActive=auth_self
+ResultAny=no
+ResultInactive=no
+
+

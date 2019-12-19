@@ -90,6 +90,12 @@ void Core::load_drivers()
     dirent *dirp;
     string extension(".so");
     d = opendir(PLUGIN_PATH);
+    
+    if (d==nullptr) {
+        cerr<<"Error opening: "<<PLUGIN_PATH<<endl;
+        return;
+    }
+    
     dirp = readdir(d);
     char ** name;
     char ** version;
@@ -103,7 +109,7 @@ void Core::load_drivers()
         
     debug<<"loading driver list..."<<endl;
     
-    while(dirp!=NULL)
+    while(dirp!=nullptr)
     {
         
         string filename(dirp->d_name);
@@ -181,7 +187,7 @@ void Core::init()
 }
 
 /**
-* This method shoul be called before closing the application so
+* This method should be called before closing the application so
 * drivers can be properly disconnected and unloaded
 */
 void Core::shutdown()
@@ -269,7 +275,7 @@ void Core::update_devices(vector<connected_device_info> * out_list)
                     get_status=(unsigned int (*)(unsigned int))dlsym(drivers[m]->handle,"get_status");
                     cdi.status=get_status(address);
                     
-                    out_list->push_back(cdi);		
+                    out_list->push_back(cdi);
                     
                     found=true;
                     break;

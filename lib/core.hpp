@@ -22,9 +22,11 @@
 
 #include "input.hpp"
 #include "driver.hpp"
+#include "log.hpp"
 
 #include <vector>
 #include <string>
+#include <ostream>
 
 namespace lliurex
 {
@@ -50,6 +52,8 @@ namespace lliurex
         class Core
         {
             private:
+            Log log;
+            
             std::vector<Driver*> drivers;
             input::BaseInputHandler * inputhandler;
             

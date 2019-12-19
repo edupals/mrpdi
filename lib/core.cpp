@@ -36,7 +36,12 @@ using namespace lliurex::mrpdi;
 
 #define PLUGIN_PATH "/usr/lib/mrpdi/"
 #define SETTINGS_PATH "/etc/mrpdi/conf.d/"
-#define DEBUG 0
+
+#ifdef NDEBUG
+    #define debug if(false)log
+#else
+    #define debug log
+#endif
 
 void pointer_callback(driver_event event)
 {
@@ -62,9 +67,9 @@ Core * Core::getCore()
  */ 
 Core::Core()
 {
-    #if DEBUG
-    cout<<"[Core]"<<endl;
-    #endif
+    log.set_header("[Core]");
+    
+    debug<<"constructor"<<endl;
     
     Core::instance=this;
     this->inputhandler=NULL;
@@ -73,9 +78,7 @@ Core::Core()
 
 Core::~Core()
 {
-    #if DEBUG
-    cout<<"[~Core]"<<endl;
-    #endif
+    debug<<"destructor"<<endl;
 }
 
 /**
@@ -98,10 +101,7 @@ void Core::load_drivers()
     
     void (*set_callback)(void(*)(driver_event));
         
-    #if DEBUG
-    cout<<"[Core]:load_drivers"<<endl;
-    cout<<"Loading driver list..."<<endl;
-    #endif
+    debug<<"loading driver list..."<<endl;
     
     while(dirp!=NULL)
     {
@@ -113,9 +113,7 @@ void Core::load_drivers()
             string path(PLUGIN_PATH);
             path=path+dirp->d_name;
             
-            #if DEBUG
-            cout<<"file:"<<path<<endl;
-            #endif
+            debug<<"file:"<<path<<endl;
             
             void* handle = dlopen(path.c_str(), RTLD_LAZY);
             if(handle!=NULL)
@@ -176,9 +174,9 @@ void Core::load_drivers()
 */
 void Core::init()
 {
-    #if DEBUG
-    cout<<"[Core]:init()"<<endl;
-    #endif
+    
+    debug<<"init"<<endl;
+    
     load_drivers();
 }
 
@@ -188,9 +186,8 @@ void Core::init()
 */
 void Core::shutdown()
 {
-    #if DEBUG
-    cout<<"[Core]:shutdown()"<<endl;
-    #endif
+
+    debug<<"shutdown"<<endl;
     
     void  (*shutdown)(void);
     
@@ -242,7 +239,6 @@ void Core::update_devices(vector<connected_device_info> * out_list)
     
     libusb_init(&ctx);
     
-    //cout<<"listing devices..."<<endl;
     n=libusb_get_device_list(ctx,&list);
     
     for(int i=0;i<n;i++)
@@ -352,9 +348,7 @@ void Core::start(unsigned int id,unsigned int address)
     Driver * driver = NULL;
     void  (*start)(unsigned int ,unsigned int);
     
-    #if DEBUG
-    cout<<"[Core] Starting: "<<hex<<id<<endl;
-    #endif
+    debug<<"starting: "<<hex<<id<<endl;
     
     for(int n=0;n<drivers.size();n++)
     {
@@ -371,9 +365,8 @@ void Core::start(unsigned int id,unsigned int address)
     
     if(driver!=NULL)
     {
-        #if DEBUG
-        cout<<"[Core] Found capable driver:"<<driver->filename<<endl;
-        #endif
+        
+        debug<<"found capable driver:"<<driver->filename<<endl;
         
         start=(void (*)(unsigned int ,unsigned int))dlsym(driver->handle,"start");
         start(id,address);
@@ -389,9 +382,7 @@ void Core::stop(unsigned int id,unsigned int address)
     Driver * driver = NULL;
     void  (*stop)(unsigned int ,unsigned int);
     
-    #if DEBUG
-    cout<<"[Core] Stopping: "<<hex<<id<<endl;
-    #endif
+    debug<<"stopping: "<<hex<<id<<endl;
     
     for(int n=0;n<drivers.size();n++)
     {

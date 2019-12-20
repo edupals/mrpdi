@@ -21,6 +21,7 @@
 #define MRPDI_INPUT
 
 #include "basedriver.hpp"
+#include "log.hpp"
 
 #include <linux/uinput.h>
 #include <linux/input.h>
@@ -73,6 +74,7 @@ namespace lliurex
             class AbsolutePointer
             {
                 protected:
+                Log log;
                 
                 int fd_uinput;
                 struct uinput_user_dev uidev;
@@ -128,6 +130,7 @@ namespace lliurex
             class InputHandler : public BaseInputHandler
             {
                 private:
+                Log log;
                 
                 std::vector<AbsolutePointer *> devices;
                 std::map<unsigned int,DeviceSettingsEntry> settings_map;

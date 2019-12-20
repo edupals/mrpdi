@@ -41,7 +41,11 @@
 #define ERASER_DEVICE_ID        0x0A 
 #define PAD_DEVICE_ID           0x0F
 
-#define DEBUG 0
+#ifdef NDEBUG
+    #define debug if(false)log
+#else
+    #define debug log
+#endif
 
 using namespace std;
 using namespace lliurex::mrpdi;
@@ -53,6 +57,7 @@ using namespace lliurex::mrpdi::input;
 InputHandler::InputHandler()
 {
     this->calibration_step=-1;
+    log.set_header("[InputHandler]");
 }
 
 /**
@@ -117,10 +122,8 @@ void InputHandler::pointer_callback(driver_event event)
                             
                             if((event.pointer.button & 0x01)==0 && calibration_press==1)
                             {
-                                #if DEBUG
-                                cout<<"Calibration STEP:"<<calibration_step<<" pointer["<<event.pointer.pointer<<"]"<<endl;
-                                #endif
                                 
+                                debug<<"calibration step:"<<calibration_step<<" pointer["<<event.pointer.pointer<<"]"<<endl;
                                 
                                 calibration_points[calibration_step*2]=event.pointer.x;
                                 calibration_points[(calibration_step*2)+1]=event.pointer.y;
@@ -134,9 +137,8 @@ void InputHandler::pointer_callback(driver_event event)
                             
                             if(calibration_step==4)
                             {
-                                #if DEBUG
-                                cout<<"Calibration completed!"<<endl;
-                                #endif
+                                debug<<"calibration completed"<<endl;
+
                                 devices[n]->set_calibration(calibration_points);
                                 CalibrationScreen::destroy();
                                 calibration_step=-1;
@@ -158,41 +160,31 @@ void InputHandler::pointer_callback(driver_event event)
                 
             }
             
-
         break;
         
         case EVENT_KEY:
-            #if DEBUG
-            cout<<"Key CALLBACK:"<<event.address<<endl;
-            #endif
+            debug<<"key callback:"<<event.address<<endl;
         break;
         
         case EVENT_DATA:
-            #if DEBUG
-            cout<<"Data CALLBACK:"<<event.address<<endl;
-            #endif
+            debug<<"data callback:"<<event.address<<endl;
         break;
         
         case EVENT_STATUS:
-            #if DEBUG
-            cout<<"Status CALLBACK:"<<event.address<<endl;
-            #endif
+            debug<<"status callback:"<<event.address<<endl;
+            
             switch(event.status.id)
             {
                 case STATUS_READY:
-                    #if DEBUG
-                    cout<<"device is READY"<<endl;
-                    #endif
+                    debug<<"device is ready"<<endl;
                 break;
                 
                 case STATUS_COMMERROR:
-                    cout<<"device communication error"<<endl;
+                    log<<"device communication error"<<endl;
                 break;
                 
                 case STATUS_SHUTDOWN:
-                    #if DEBUG
-                    cout<<"device is shut down"<<endl;
-                    #endif
+                    debug<<"device is shut down"<<endl;
                 break;
             }
         break;
@@ -206,9 +198,9 @@ void InputHandler::pointer_callback(driver_event event)
 */ 
 void InputHandler::start(unsigned int id,unsigned int address)
 {
-    #if DEBUG
-    cout<<"InputHandler::start"<<endl;
-    #endif
+    
+    debug<<"start"<<endl;
+    
     vector<string> param_list;
     AbsolutePointer * dev;
     unsigned int num_pointers=0;
@@ -226,9 +218,8 @@ void InputHandler::start(unsigned int id,unsigned int address)
         {
             string pname = ppointer->first;
             unsigned int pvalue = ppointer->second;
-            #if DEBUG
-                cout<<"* set_parameter("<<hex<<id<<","<<pname<<","<<dec<<pvalue<<")"<<endl;
-            #endif
+            debug<<"* set_parameter("<<hex<<id<<","<<pname<<","<<dec<<pvalue<<")"<<endl;
+
             Core::getCore()->set_parameter(id,pname.c_str(),pvalue);
             
         }
@@ -257,9 +248,7 @@ void InputHandler::start(unsigned int id,unsigned int address)
     
     if(num_pointers>0)
     {
-        #if DEBUG
-        cout<<"InputHandler: Available pointers-> "<<num_pointers<<endl;
-        #endif
+        debug<<"available pointers:"<<num_pointers<<endl;
         
         string dev_name = Core::getCore()->get_device_name(id);
         
@@ -284,24 +273,19 @@ void InputHandler::start(unsigned int id,unsigned int address)
             
             settings_map[id].id=id; //quite redundant, huh?
             settings_map[id].name=dev_name;
-            #if DEBUG
-            cout<<"InputHandler: There is no default setup for "<<id<<endl;
-            #endif
             
+            debug<<"there is no default setup for "<<id<<endl;
             
             if(calibrate==1)
             {
-                #if DEBUG
-                cout<<"InputHandler: Device requested calibration"<<endl;
-                #endif
+                debug<<"device requested calibration"<<endl;
+                
                 this->calibrate(address);
             }
         }
         else
         {
-            #if DEBUG
-            cout<<"InputHandler: Using stored calibration"<<endl;
-            #endif
+            debug<<"using stored calibration"<<endl;
             dev->set_calibration(settings_map[id].calibration);
         }
     }
@@ -314,9 +298,9 @@ void InputHandler::start(unsigned int id,unsigned int address)
 */ 
 void InputHandler::stop(unsigned int id,unsigned int address)
 {
-    #if DEBUG
-    cout<<"InputHandler::stop"<<endl;
-    #endif
+
+    debug<<"stop"<<endl;
+
     vector<AbsolutePointer*> backvector;
     
     for(int n=0;n<devices.size();n++)
@@ -341,10 +325,8 @@ void InputHandler::stop(unsigned int id,unsigned int address)
 */ 
 void InputHandler::calibrate(unsigned int address)
 {
-    #if DEBUG
-    cout<<"[InputHandler]::calibrate()"<<endl;
-    #endif
-        
+    debug<<"calibrate"<<endl;
+    
     //forces calibration screen creation
     CalibrationScreen::get_CalibrationScreen()->step(0);
     //NOTE: This order is important, to avoid callback event to instance a second calibration screen
@@ -355,9 +337,9 @@ void InputHandler::calibrate(unsigned int address)
 
 AbsolutePointer::AbsolutePointer(string name,unsigned int id,unsigned int address,unsigned char pointer,unsigned int flags)
 {
-    #if DEBUG
-    cout<<"AbsolutePointer()"<<endl;
-    #endif
+    log.set_header("[AbsolutePointer]");
+    debug<<"constructor"<<endl;
+    
     this->name=name;
     this->id=id;
     this->address=address;
@@ -386,9 +368,9 @@ AbsolutePointer::AbsolutePointer(string name,unsigned int id,unsigned int addres
 
 AbsolutePointer::~AbsolutePointer()
 {
-    #if DEBUG
-    cout<<"~AbsolutePointer()"<<endl;
-    #endif
+    
+    debug<<"destructor"<<endl;
+    
 }
 
 /**
@@ -398,15 +380,15 @@ AbsolutePointer::~AbsolutePointer()
 void AbsolutePointer::start()
 {
 
-    #if DEBUG
-    cout<<"AbsolutePointer start:"<<name<<endl;
-    #endif
+    
+    debug<<"start:"<<name<<endl;
+    
     
     fd_uinput = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
 
     if(fd_uinput<0)
     {
-        cerr<<"Failed to open uinput"<<endl;
+        log<<"failed to open uinput"<<endl;
         return;
     }
     
@@ -440,24 +422,23 @@ void AbsolutePointer::start()
         set_uinput(UI_SET_ABSBIT, ABS_Z);
     }
     
-    
     //creating device
     if(write(fd_uinput, &uidev, sizeof(uidev))<0)
     {
-        cerr<<"Error sending device descriptor"<<endl;
+        log<<"error sending device descriptor"<<endl;
     }
     set_uinput(UI_DEV_CREATE,0);
     
-    #if DEBUG
-    cout<<"completed"<<endl;
-    #endif
+    
+    debug<<"completed"<<endl;
+    
 }
 
 void AbsolutePointer::stop()
 {
-    #if DEBUG
-    cout<<"AbsolutePointer stop()"<<endl;
-    #endif
+    
+    debug<<"stop"<<endl;
+    
     set_uinput(UI_DEV_DESTROY,0);
     close(fd_uinput);
 }
@@ -551,15 +532,15 @@ void AbsolutePointer::update()
     ev.value = 0;
     send_uinput(&ev);
     
-    
 }
 
 int AbsolutePointer::set_uinput(unsigned long int property,unsigned int value)
 {
     int res;
     res=ioctl(fd_uinput, property, value);
-    if(res<0)
-        cerr<<"Error ioctl uinput:"<<property<<endl;
+    if(res<0) {
+        log<<"error ioctl uinput:"<<property<<endl;
+    }
     return res;
 }
 
@@ -567,8 +548,9 @@ int AbsolutePointer::send_uinput(input_event * ev)
 {
     int res;
     res=write(fd_uinput, ev, sizeof(*ev));
-    if(res<0)
-        cerr<<"Error writing to uinput"<<endl;
+    if(res<0) {
+        log<<"error writing to uinput"<<endl;
+    }
     return res;
 }
 

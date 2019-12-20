@@ -20,6 +20,7 @@
 #include <core.hpp>
 #include <input.hpp>
 #include <basedriver.hpp>
+#include <log.hpp>
 
 #include <libconfig.h++>
 
@@ -32,7 +33,11 @@
 #include <sstream>
 #include <fstream>
 
-#define DEBUG 0
+#ifdef NDEBUG
+    #define debug if(false)log
+#else
+    #define debug log
+#endif
 
 using namespace lliurex::mrpdi;
 using namespace std;
@@ -41,6 +46,8 @@ bool quit_requested=false;
 
 map<unsigned int,input::DeviceSettingsEntry> settings_map;
 bool corrupted_settings=false;
+
+Log log;
 
 /**
  * loads calibration setup
@@ -67,7 +74,7 @@ void load_setup()
             
             if(version_str!="2.0")
             {
-                cout<<"Warning: Unknown format version: "<<version_str<<endl;
+                log<<"warning: unknown format version: "<<version_str<<endl;
             }
         
             libconfig::Setting & setting = cfg.lookup("mrpdi.devices");
@@ -89,15 +96,15 @@ void load_setup()
                     settings_map[id].calibration[m]=setting[n]["calibration"][m];
                 }
                 
-                cout<<"name:"<<name<<endl;
-                cout<<"params: "<<setting[n]["params"].getLength()<<endl;
+                log<<"name:"<<name<<endl;
+                log<<"params: "<<setting[n]["params"].getLength()<<endl;
                 for(int m=0;m<setting[n]["params"].getLength();m++)
                 {
                     string name;
                     unsigned int value;
                     setting[n]["params"][m].lookupValue("name",name);
                     setting[n]["params"][m].lookupValue("value",value);
-                    cout<<"* "<<name<<":"<<value<<endl;
+                    log<<"* "<<name<<":"<<value<<endl;
                     settings_map[id].params[name]=value;
                 }
                 
@@ -106,7 +113,7 @@ void load_setup()
         }//try
         catch(libconfig::ParseException &e)
         {
-            cerr<<"* Error parsing config file"<<endl;
+            log<<"error parsing config file"<<endl;
             settings_map.clear();
             corrupted_settings=true;
         }
@@ -156,7 +163,7 @@ void save_setup()
         
         for(pit=it->second.params.begin();pit!=it->second.params.end();pit++)
         {
-            cout<<"* name:"<<pit->first<<" value:"<<pit->second<<endl;
+            log<<"* name:"<<pit->first<<" value:"<<pit->second<<endl;
             libconfig::Setting & param = params.add(libconfig::Setting::TypeGroup);
             libconfig::Setting & pname = param.add("name",libconfig::Setting::TypeString);
             pname=pit->first;
@@ -172,9 +179,9 @@ void save_setup()
 
 void quit_handler(int sig)
 {
-    #if DEBUG
-    cout<<"[SIGNAL]:"<<sig<<endl;
-    #endif
+    
+    debug<<"signal "<<sig<<endl;
+    
     quit_requested=true;
 }
 
@@ -197,9 +204,9 @@ int main(int argc,char * argv[])
     vector<connected_device_info> list;
     vector<string> params;
     
-    #if DEBUG
-    cout<<"[mrpdi cli]: start"<<endl;
-    #endif
+    log.set_header("[mrpdi-cli]");
+    
+    debug<<"start"<<endl;
     
     signal(SIGABRT,&quit_handler);
     signal(SIGTERM,&quit_handler);
@@ -210,12 +217,14 @@ int main(int argc,char * argv[])
     
     if(argc>1)
     {
-        if(strcmp(argv[1],"--help")==0)
+        string option=argv[1];
+        
+        if(option=="--help")
         {
             display_usage();
         }
         
-        if(strcmp(argv[1],"--list")==0)
+        if(option=="--list")
         {
             core->update_devices(&list);
     
@@ -226,13 +235,15 @@ int main(int argc,char * argv[])
             }
         }
         
-        if(strcmp(argv[1],"--run")==0)
+        if(option=="--run")
         {
             if(argc>2)
             {
                 bool found=false;
                 unsigned int id;
-                unsigned int address;			
+                unsigned int address;
+                string name;
+                
                 string str(argv[2]);
                 istringstream sp(str,istringstream::in);
                 sp>>hex>>address;
@@ -245,12 +256,18 @@ int main(int argc,char * argv[])
                         if(list[n].address==address)
                         {
                             id=list[n].id;
+                            name=list[n].name;
                             found=true;
-                            cout<<"* Device found!"<<endl;
+                            debug<<"found device"<<endl;
                         }
                 }
                 
-                cout<<"* Device to run:"<<hex<<id<<":"<<endl;
+                uint16_t vid,pid;
+                
+                vid = (id & 0xffff0000)>>16;
+                pid = id & 0x0000ffff;
+                
+                log<<"running device "<<hex<<vid<<":"<<pid<<" "<<name<<endl;
                 
                 if(found)
                 {
@@ -277,7 +294,7 @@ int main(int argc,char * argv[])
         }
         
         //auto mode
-        if(strcmp(argv[1],"--auto")==0)
+        if(option=="--auto")
         {
             unsigned int id, address;
             bool quit_dev;
@@ -295,13 +312,13 @@ int main(int argc,char * argv[])
                 core->update_devices(&list);
                 if(list.size()>0)
                 {
-                    cout<<"* Connecting to "<<list[0].name<<endl;
+                    log<<"connecting to "<<list[0].name<<endl;
                     address=list[0].address;
                     id=list[0].id;
                     quit_dev=false;
                     
                     core->start(id,address);
-                                        
+                    
                     while(!quit_dev && !quit_requested)
                     {
                         core->update_devices(&list);
@@ -313,7 +330,7 @@ int main(int argc,char * argv[])
                                 found=true;
                                 if(list[n].status==DEV_STATUS_STOP)
                                 {
-                                    cout<<"* Disconnected!"<<endl;
+                                    log<<"disconnected"<<endl;
                                     quit_dev=true;
                                     break;
                                 }
@@ -322,7 +339,7 @@ int main(int argc,char * argv[])
                         
                         if(!found)
                         {
-                            cout<<"* Device no longer connected"<<endl;
+                            log<<"device no longer connected"<<endl;
                             quit_dev=true;
                         }
                         sleep(1);
@@ -343,9 +360,7 @@ int main(int argc,char * argv[])
     
     core->shutdown();
     
-    #if DEBUG
-    cout<<"[mrpdi cli]: shutdown"<<endl;   
-    #endif
+    debug<<"shutdown"<<endl;
     
     delete core;
      

@@ -29,6 +29,9 @@
 #include <vector>
 #include <map>
 
+#define DRIVER_HEADER "[Tablet] "
+#define out if(common.debug==1)clog<<DRIVER_HEADER
+
 using namespace std;
 
 struct driver_instance_info
@@ -155,8 +158,8 @@ void init()
 */
 void shutdown()
 {
-    if(common.debug)
-        cout<<"Shutdown:"<<name<<endl;
+    
+    out<<"shutdown:"<<name<<endl;
     
 }
 
@@ -180,8 +183,8 @@ void start(unsigned int id,unsigned int address)
     
     if(!found)
     {
-        if(common.debug)
-            cout<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        
+        out<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
             
         info = new driver_instance_info;
         info->id=id;
@@ -230,13 +233,12 @@ void stop(unsigned int id,unsigned int address)
     {
         
         driver_instances=tmp;
-        if(common.debug)
-            cout<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        
+        out<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
         
         info->quit_request=true;
         
-        if(common.debug)
-            cout<<"joining to:"<<info->address<<endl;
+        out<<"joining to:"<<info->address<<endl;
         
         pthread_join(info->thread,NULL);
         //once thread is already dead we don't need its instance reference anymore
@@ -275,12 +277,12 @@ void * thread_core(void* param)
         {
             if(common.debug==1)
             {		
-                cout<<"*** DATA:"<<hex<<info->id<<":"<<info->address<<" ***"<<endl;
+                clog<<"*** DATA:"<<hex<<info->id<<":"<<info->address<<" ***"<<endl;
                 for(int n=0;n<res;n++)
                 {
-                    cout<<dec<<(unsigned int)buffer[n]<<endl;
+                    clog<<dec<<(unsigned int)buffer[n]<<endl;
                 }
-                cout<<"***********"<<endl;
+                clog<<"***********"<<endl;
             }
             
             switch(info->id)
@@ -302,13 +304,13 @@ void * thread_core(void* param)
                         pointer_callback(event);
                         */
                         if ( (key & 0x08) ==0x08)
-                            cout<<"Key One"<<endl;
+                            clog<<"Key One"<<endl;
                             
                         if ( (key & 0x10) ==0x10)
-                            cout<<"Key Middle"<<endl;
+                            clog<<"Key Middle"<<endl;
                             
                         if ( (key & 0x20) ==0x20)
-                            cout<<"Key Two"<<endl;
+                            clog<<"Key Two"<<endl;
                          
                     }
                     
@@ -434,9 +436,9 @@ void * thread_core(void* param)
                         
                         if(common.debug==1)
                         {
-                            cout<<dec<<"mx:"<<mx<<endl;
-                            cout<<dec<<"my:"<<my<<endl;
-                            cout<<dec<<"mz:"<<mz<<endl;
+                            clog<<dec<<"mx:"<<mx<<endl;
+                            clog<<dec<<"my:"<<my<<endl;
+                            clog<<dec<<"mz:"<<mz<<endl;
                         }
                     }
                 break;
@@ -502,14 +504,13 @@ void init_driver(driver_instance_info * info)
     char path[16];
     unsigned char iface;
     
-    if(common.debug)
-        cout<<"*** init_driver ***"<<endl;
+    out<<"init driver"<<endl;
     
     iface = get_iface(info->id,supported_devices);
     build_path(info->address,iface,path);
     info->handle = hid_open_path(path);
-    if(common.debug)
-        cout<<"usb path:"<<path<<endl;
+
+    out<<"usb path:"<<path<<endl;
     
     if(info->handle==NULL)
     {
@@ -592,8 +593,8 @@ void init_driver(driver_instance_info * info)
 */
 void close_driver(driver_instance_info * info)
 {
-    if(common.debug)
-        cout<<"*** close_driver ***"<<endl;
+    
+    out<<"close driver"<<endl;
     
     if(info->handle!=NULL)
     {
@@ -662,8 +663,8 @@ void close_driver(driver_instance_info * info)
 */
 void set_parameter(const char * key,unsigned int value)
 {
-    if(common.debug)
-        cout<<"[TabletDriver::set_parameter]:"<<value<<endl;
+    
+    out<<"set_parameter:"<<value<<endl;
     
     *(parameter_map[key])=value;
 }
@@ -680,8 +681,6 @@ int get_parameter(const char * key,unsigned int * value)
     if(it==parameter_map.end())return -1;
     
     *value=*parameter_map[key];
-    if(common.debug)
-        cout<<"[TabletDriver::get_parameter]:"<<*value<<endl;
     
     return 0;
 }
@@ -707,7 +706,7 @@ unsigned int get_status(unsigned int address)
 
 void set_callback( void(*callback)(driver_event) )
 {
-    if (common.debug)
-        cout<<"[TabletDriver] set_callback"<<endl;
+
+    out<<"set_callback"<<endl;
     pointer_callback = callback;
 }

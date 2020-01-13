@@ -37,6 +37,10 @@
 #define MAX_X	3537
 #define MAX_Y	3270
 
+#define DRIVER_HEADER "[IQBoard] "
+#define out if(common.debug==1)clog<<DRIVER_HEADER
+#define err cerr<<DRIVER_HEADER
+
 using namespace std;
 
 struct driver_instance_info
@@ -111,8 +115,8 @@ void init()
     iqboard.calibrate=1;
     iqboard.tty=0;
     
-    if(common.debug)
-        cout<<"[IQboardDriver]: init"<<endl;
+    
+    out<<"init"<<endl;
     
 }
 
@@ -121,9 +125,7 @@ void init()
 */
 void shutdown()
 {
-    if(common.debug)
-        cout<<"[IQboardDriver] Shutdown:"<<name<<endl;
-    
+    out<<"shutdown:"<<name<<endl;
 }
 
 /**
@@ -147,8 +149,8 @@ void start(unsigned int id,unsigned int address)
     
     if(!found)
     {
-        if(common.debug)
-            cout<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        
+        out<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
                         
         info = new driver_instance_info;
         info->id=id;
@@ -158,13 +160,13 @@ void start(unsigned int id,unsigned int address)
         
         if(pthread_create(&info->thread, NULL,  thread_core, info)!=0)
         {
-            cerr<<"[IQboardDriver] Failed to spawn thread"<<endl;
+            err<<"failed to spawn thread"<<endl;
         }
         
     }
     else
     {
-        cerr<<"[IQboardDriver] driver already loaded!"<<endl;
+        err<<"driver already loaded!"<<endl;
     }
     
 }
@@ -198,18 +200,17 @@ void stop(unsigned int id,unsigned int address)
         
         driver_instances=tmp;
         
-        if(common.debug)
-            cout<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        out<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
         info->quit_request=true;
-        if(common.debug)
-            cout<<"[IQboardDriver] joining to:"<<info->address<<endl;
+
+        out<<"joining to:"<<info->address<<endl;
         pthread_join(info->thread,NULL);
         //once thread is already dead we don't need its instance reference anymore
         delete info;
     }
     else
     {
-        cerr<<"[IQboardDriver] driver already unloaded!"<<endl;
+        err<<"driver already unloaded!"<<endl;
     }
     
 }
@@ -226,16 +227,16 @@ void * thread_core(void* param)
 
     init_driver(info);
     
-    if(common.debug)
-        cout<<"[IQboardDriver] thread_core::enter"<<endl;
+    out<<"thread_core::enter"<<endl;
         
     while(!info->quit_request)
     {
         if(info->wait==0)
         {
             res = write(info->fd,iqboard_header,8);
-            if(res<0)
-                cerr<<"[IQboardDriver] failed to send data"<<endl;
+            if(res<0) {
+                err<<"failed to send data"<<endl;
+            }
             else
             {
                 //cout<<"[IQboardDriver] HEADER sent"<<endl;
@@ -281,7 +282,7 @@ void * thread_core(void* param)
             }
             else
             {
-                cerr<<"[IQboardDriver] Bad checksum"<<endl;
+                err<<"bad checksum"<<endl;
                 
                 //sending error event
                 driver_event event;
@@ -295,7 +296,7 @@ void * thread_core(void* param)
         }
         else
         {
-            cerr<<"[IQboardDriver] failed to receive data"<<endl;
+            err<<"failed to receive data"<<endl;
             //sending error event
             driver_event event;
             event.id=info->id;
@@ -308,8 +309,7 @@ void * thread_core(void* param)
         usleep(500);
     }
         
-    if(common.debug)
-        cout<<"[IQboardDriver] thread_core::exit"<<endl;
+    out<<"thread_core::exit"<<endl;
     close_driver(info);
     
     return NULL;	
@@ -328,13 +328,12 @@ void init_driver(driver_instance_info * info)
     struct termios options;
     stringstream ss;
     
-    if(common.debug)
-        cout<<"[IQboardDriver]init_driver"<<endl;
+    out<<"init_driver"<<endl;
     
     ss<<"/dev/ttyUSB"<<iqboard.tty;
     info->fd = open(ss.str().c_str(),O_RDWR | O_NOCTTY | O_NONBLOCK);
     fcntl(info->fd, F_SETFL, 0);
-    cout<<"status:"<<info->fd<<endl;
+    out<<"status:"<<info->fd<<endl;
     tcgetattr(info->fd, &options);
     cfsetispeed(&options, B19200);
     cfsetospeed(&options, B19200);
@@ -362,8 +361,8 @@ void init_driver(driver_instance_info * info)
 */
 void close_driver(driver_instance_info * info)
 {
-    if(common.debug)
-        cout<<"[IQboardDriver] close_driver"<<endl;
+    
+    out<<"close_driver"<<endl;
         
     close(info->fd);
     
@@ -381,8 +380,8 @@ void close_driver(driver_instance_info * info)
 */
 void set_parameter(const char * key,unsigned int value)
 {
-    if(common.debug)
-        cout<<"[IQboardDriver] set_parameter:"<<value<<endl;
+    
+    out<<"set_parameter:"<<value<<endl;
     *(parameter_map[key])=value;
 }
 
@@ -399,8 +398,8 @@ int get_parameter(const char * key,unsigned int * value)
     
     *value=*parameter_map[key];
     
-    if(common.debug)
-        cout<<"[IQboardDriver] get_parameter:"<<*value<<endl;
+    
+    out<<"get_parameter:"<<*value<<endl;
     return 0;
 }
 
@@ -425,7 +424,7 @@ unsigned int get_status(unsigned int address)
 
 void set_callback( void(*callback)(driver_event) )
 {
-    if(common.debug)
-        cout<<"[IQboardDriver] set_callback"<<endl;
+    
+    out<<"set_callback"<<endl;
     pointer_callback = callback;
 }

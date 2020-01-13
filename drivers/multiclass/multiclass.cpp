@@ -32,6 +32,10 @@
 #include <iostream>
 #include <unistd.h>
 
+#define DRIVER_HEADER "[Multiclass] "
+#define out if(common.debug==1)clog<<DRIVER_HEADER
+#define err cerr<<DRIVER_HEADER
+
 using namespace std;
 
 struct driver_instance_info
@@ -111,8 +115,8 @@ void init()
     multiclass.calibrate=1;
     multiclass.tty=0;
     
-    if(common.debug)
-        cout<<"[MultiClassDriver]: init"<<endl;
+    
+    out<<"init"<<endl;
     
     
 }
@@ -122,8 +126,8 @@ void init()
 */
 void shutdown()
 {
-    if(common.debug)
-        cout<<"[MultiClassDriver] Shutdown:"<<name<<endl;
+    
+    out<<"shutdown:"<<name<<endl;
     
 }
 
@@ -147,8 +151,7 @@ void start(unsigned int id,unsigned int address)
     
     if(!found)
     {
-        if(common.debug)
-            cout<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        out<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
                         
         info = new driver_instance_info;
         info->id=id;
@@ -159,18 +162,18 @@ void start(unsigned int id,unsigned int address)
         
         if(pthread_create(&info->thread, NULL,  thread_core, info)!=0)
         {
-            cerr<<"[MultiClassDriver] Failed to spawn thread"<<endl;
+            err<<"failed to spawn thread"<<endl;
         }
         
         if(pthread_create(&info->keep_alive_thread, NULL, keep_alive, info)!=0)
         {
-            cerr<<"[MultiClassDriver] Failed to spawn keep alive thread"<<endl;
+            err<<"failed to spawn keep alive thread"<<endl;
         }
         
     }
     else
     {
-        cerr<<"[MultiClassDriver] driver already loaded!"<<endl;
+        err<<"driver already loaded!"<<endl;
     }
     
 }
@@ -204,11 +207,10 @@ void stop(unsigned int id,unsigned int address)
         
         driver_instances=tmp;
         
-        if(common.debug)
-            cout<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        out<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
         info->quit_request=true;
-        if(common.debug)
-            cout<<"[MultiClassDriver] joining to:"<<info->address<<endl;
+        
+        out<<"joining to:"<<info->address<<endl;
         pthread_join(info->thread,NULL);
         pthread_join(info->keep_alive_thread,NULL);
         
@@ -217,7 +219,7 @@ void stop(unsigned int id,unsigned int address)
     }
     else
     {
-        cerr<<"[MultiClassDriver] driver already unloaded!"<<endl;
+        err<<"driver already unloaded!"<<endl;
     }
     
 }
@@ -230,22 +232,20 @@ void * keep_alive(void* param)
     driver_instance_info * info = (driver_instance_info *)param;
     int res;
     
-    if(common.debug)
-        cout<<"[MultiClassDriver] keep_alive enter"<<endl;
+    out<<"keep_alive enter"<<endl;
     
     while(!info->keep_alive_quit_request)
     {
         if(info->header==1)
         {
             res=write(info->fd,&cmd_keep_alive,1);
-            if(res<=0)cout<<"[MultiClassDriver]: Error sending keep alive message!"<<endl;
+            if(res<=0)err<<"error sending keep alive message!"<<endl;
         }	
     
         sleep(1);
     }
     
-    if(common.debug)
-        cout<<"[MultiClassDriver] keep_alive exit"<<endl;
+    out<<"keep_alive exit"<<endl;
 }
 
 /**
@@ -263,8 +263,7 @@ void * thread_core(void* param)
 
     init_driver(info);
     
-    if(common.debug)
-        cout<<"[MultiClassDriver] thread_core::enter"<<endl;
+    out<<"thread_core::enter"<<endl;
         
     while(!info->quit_request)
     {
@@ -277,8 +276,8 @@ void * thread_core(void* param)
             {
                 if(buffer[0]==0xA8)
                 {
-                    if(common.debug)
-                        cout<<"* header message, welcome Multiclass! ^_^"<<endl;
+                    
+                    out<<"* header message, welcome Multiclass! ^_^"<<endl;
                     info->header=1;//mark header status as received
                 }
                 
@@ -329,7 +328,7 @@ void * thread_core(void* param)
                     }
                     else
                     {
-                        cout<<"[MultiClassBoard]: Checksum error"<<endl;
+                        err<<"checksum error"<<endl;
                     }	
             
                 }
@@ -372,9 +371,8 @@ void * thread_core(void* param)
     
     //turn off keep_alive thread
     info->keep_alive_quit_request=true;
-        
-    if(common.debug)
-        cout<<"[MultiClassDriver] thread_core::exit"<<endl;
+    
+    out<<"thread_core::exit"<<endl;
     close_driver(info);
     
     return NULL;	
@@ -394,14 +392,13 @@ void init_driver(driver_instance_info * info)
     int res;
     stringstream ss;
     
-    if(common.debug)
-        cout<<"[MultiClassDriver]init_driver"<<endl;
+    out<<"init_driver"<<endl;
     
     ss<<"/dev/ttyUSB"<<multiclass.tty;
     info->fd = open(ss.str().c_str(),O_RDWR | O_NOCTTY | O_NONBLOCK);
     fcntl(info->fd, F_SETFL, FNDELAY); //set non-blocking reads
-    if(common.debug)
-        cout<<"status:"<<info->fd<<endl;
+    
+    out<<"status:"<<info->fd<<endl;
         
     tcgetattr(info->fd, &options);
     cfsetispeed(&options, B9600);
@@ -415,17 +412,17 @@ void init_driver(driver_instance_info * info)
     tcsetattr(info->fd, TCSANOW, &options);
         
     //from what I tested, I should wait at least one second before start reading the board
-    if(common.debug)
-        cout<<"[MultiClassDriver] Waiting"<<endl;
+    
+    out<<"Waiting"<<endl;
     sleep(1);
-    if(common.debug)
-        cout<<"[MultiClassDriver] Initialiazing...";
+    
+    out<<"Initialiazing...";
     
     res=write(info->fd,&cmd_init,1);
     if(common.debug)
     {
-        if(res>0)cout<<"done"<<endl;
-            else cout<<"fail"<<endl;
+        if(res>0)clog<<"done"<<endl;
+            else clog<<"fail"<<endl;
     }
         
     //sending ready event
@@ -444,8 +441,8 @@ void init_driver(driver_instance_info * info)
 */
 void close_driver(driver_instance_info * info)
 {
-    if(common.debug)
-        cout<<"[MultiClassDriver] close_driver"<<endl;
+    
+    out<<"close_driver"<<endl;
     
     close(info->fd);
     
@@ -463,8 +460,8 @@ void close_driver(driver_instance_info * info)
 */
 void set_parameter(const char * key,unsigned int value)
 {
-    if(common.debug)
-        cout<<"[MultiClassDriver] set_parameter:"<<value<<endl;
+    
+    out<<"set_parameter:"<<value<<endl;
     *(parameter_map[key])=value;
 }
 
@@ -481,8 +478,8 @@ int get_parameter(const char * key,unsigned int * value)
     
     *value=*parameter_map[key];
     
-    if(common.debug)
-        cout<<"[MultiClassDriver] get_parameter:"<<*value<<endl;
+    out<<"get_parameter:"<<*value<<endl;
+    
     return 0;
 }
 
@@ -507,7 +504,6 @@ unsigned int get_status(unsigned int address)
 
 void set_callback( void(*callback)(driver_event) )
 {
-    if(common.debug)
-        cout<<"[MultiClassDriver] set_callback"<<endl;
+    out<<"set_callback"<<endl;
     pointer_callback = callback;
 }

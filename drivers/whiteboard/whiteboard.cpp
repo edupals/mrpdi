@@ -30,6 +30,9 @@
 #include <map>
 #include <cmath>
 
+#define DRIVER_HEADER "[WhiteBoard] "
+#define out if(common.debug==1)clog<<DRIVER_HEADER
+
 using namespace std;
 
 struct driver_instance_info
@@ -213,9 +216,7 @@ void init()
 */
 void shutdown()
 {
-    if(common.debug)
-        cout<<"Shutdown:"<<name<<endl;
-    
+    out<<"shutdown:"<<name<<endl;
 }
 
 /**
@@ -238,8 +239,8 @@ void start(unsigned int id,unsigned int address)
     
     if(!found)
     {
-        if(common.debug)
-            cout<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        
+        out<<"start:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
         
         info = new driver_instance_info;
         info->id=id;
@@ -288,13 +289,11 @@ void stop(unsigned int id,unsigned int address)
         
         driver_instances=tmp;
         
-        if(common.debug)
-            cout<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
+        out<<"stop:"<<name<<" device:"<<hex<<id<<":"<<address<<endl;
         
         info->quit_request=true;
         
-        if(common.debug)
-            cout<<"joining to:"<<info->address<<endl;
+        out<<"joining to:"<<info->address<<endl;
             
         pthread_join(info->thread,NULL);
         //once thread is already dead we don't need its instance reference anymore
@@ -330,12 +329,12 @@ void * thread_core(void* param)
         {
             if(common.debug==2)
             {		
-                cout<<"*** DATA:"<<hex<<info->id<<":"<<info->address<<" ***"<<endl;
+                clog<<"*** DATA:"<<hex<<info->id<<":"<<info->address<<" ***"<<endl;
                 for(int n=0;n<res;n++)
                 {
-                    cout<<dec<<(unsigned int)buffer[n]<<endl;
+                    clog<<dec<<(unsigned int)buffer[n]<<endl;
                 }
-                cout<<"***********"<<endl;
+                clog<<"***********"<<endl;
             }
             
             switch(info->id)
@@ -391,8 +390,7 @@ void * thread_core(void* param)
                         }
                         else
                         {
-                            if(common.debug)
-                                cout<<"Distance too long, aborting movement. Check battery."<<endl;
+                            out<<"distance too long, aborting movement. Check battery."<<endl;
                         }
                         
                         info->ebeam.mx=mx;
@@ -400,15 +398,15 @@ void * thread_core(void* param)
                         
                         if(common.debug)
                         {
-                            cout<<dec<<"fiability: "<<(int)buffer[5]<<endl;
-                            cout<<dec<<"pointer id: "<<(int)( (buffer[6] & 0xf0)>>4 )<<endl;
-                            cout<<dec<<"buffer 7: "<<(int)buffer[7]<<endl;
+                            clog<<dec<<"fiability: "<<(int)buffer[5]<<endl;
+                            clog<<dec<<"pointer id: "<<(int)( (buffer[6] & 0xf0)>>4 )<<endl;
+                            clog<<dec<<"buffer 7: "<<(int)buffer[7]<<endl;
                         }
                     }
                     else
                     {
-                        if(common.debug)
-                            cout<<dec<<"fiability: "<<(int)buffer[5]<<endl;
+                        
+                        out<<dec<<"fiability: "<<(int)buffer[5]<<endl;
                         
                     }
                     
@@ -425,8 +423,8 @@ void * thread_core(void* param)
                         {
                             //watch dog and status
                             case 0xd2:
-                                if(common.debug)
-                                    cout<<"-> cmd: 0xd2:"<<hex<<(int)buffer[2]<<endl;
+                                
+                                out<<"-> cmd: 0xd2:"<<hex<<(int)buffer[2]<<endl;
                                 
                                 if(buffer[2]==0)
                                 {
@@ -445,7 +443,7 @@ void * thread_core(void* param)
                                 {
                                     if(common.debug)
                                     {
-                                        cout<<"Unknown D2 param:"<<hex<<(int)buffer[2]<<endl;
+                                        clog<<"Unknown D2 param:"<<hex<<(int)buffer[2]<<endl;
                                         for(int n=0;n<res;n++)
                                             cout<<hex<<(int)buffer[n]<<" ";
                                         cout<<endl;
@@ -455,17 +453,17 @@ void * thread_core(void* param)
                             
                             //input coords
                             case 0xb4:
-                                if(common.debug)
-                                    cout<<"-> cmd: 0xb4:"<<hex<<(int)buffer[2]<<endl;
+                                
+                                out<<"-> cmd: 0xb4:"<<hex<<(int)buffer[2]<<endl;
                                 
                                 if(buffer[2]==1)
                                 {
                                     if(common.debug)
                                     {
-                                        cout<<"Unknown b4 param:"<<hex<<(int)buffer[2]<<endl;
+                                        clog<<"Unknown b4 param:"<<hex<<(int)buffer[2]<<endl;
                                         for(int n=0;n<res;n++)
-                                            cout<<hex<<(int)buffer[n]<<" ";
-                                        cout<<endl;
+                                            clog<<hex<<(int)buffer[n]<<" ";
+                                        clog<<endl;
                                     }
                                 }
                                 
@@ -501,18 +499,18 @@ void * thread_core(void* param)
                             
                             //pen board status
                             case 0xe1:
-                                if(common.debug)
-                                    cout<<"-> cmd: 0xe1:"<<hex<<(int)buffer[2]<<endl;
+                                
+                                out<<"-> cmd: 0xe1:"<<hex<<(int)buffer[2]<<endl;
                                 
                                 //unknown datagram
                                 if(buffer[2]==0x14)
                                 {
                                     if(common.debug)
                                     {
-                                        cout<<"Unknown b4 param:"<<hex<<(int)buffer[2]<<endl;
+                                        clog<<"Unknown b4 param:"<<hex<<(int)buffer[2]<<endl;
                                         for(int n=0;n<res;n++)
-                                            cout<<hex<<(int)buffer[n]<<" ";
-                                        cout<<endl;
+                                            clog<<hex<<(int)buffer[n]<<" ";
+                                        clog<<endl;
                                     }
                                 }
                                 
@@ -521,8 +519,7 @@ void * thread_core(void* param)
                                 {
                                     info->smart.pen_status=buffer[3];
                                     
-                                    if(common.debug)
-                                        cout<<"status:"<<hex<<(int)buffer[3]<<endl;
+                                    out<<"status:"<<hex<<(int)buffer[3]<<endl;
                                                                         
                                     for(int n=0;n<6;n++)
                                     {
@@ -533,8 +530,8 @@ void * thread_core(void* param)
                                             }
                                     }
                                     
-                                    if(common.debug)
-                                        cout<<"lighting:"<<hex<<(int)smart_pen_lights[info->smart.pen_selected][1]<<endl;
+                                    
+                                    out<<"lighting:"<<hex<<(int)smart_pen_lights[info->smart.pen_selected][1]<<endl;
                                     
                                     smart_set_lights(info,buffer[3],smart_pen_lights[info->smart.pen_selected][1]);
                                     
@@ -557,7 +554,7 @@ void * thread_core(void* param)
                                         cout<<hex<<(int)buffer[n]<<" ";
                                     cout<<endl;
                                     */
-                                    cout<<"* key press: "<<hex<<(int)buffer[3]<<endl;
+                                    clog<<"* key press: "<<hex<<(int)buffer[3]<<endl;
                                     
                                     //right click
                                     info->smart.right_click=((buffer[3] & 0x02)>>1);
@@ -566,8 +563,8 @@ void * thread_core(void* param)
                             break;
                             
                             default:
-                                if(common.debug)
-                                    cout<<"Unknown command:"<<hex<<(int)buffer[1]<<endl;
+                                
+                                out<<"unknown command:"<<hex<<(int)buffer[1]<<endl;
                                 
                             break;
                         }
@@ -576,8 +573,8 @@ void * thread_core(void* param)
                     
                     if(buffer[0]!=2)
                     {
-                        if(common.debug)
-                            cout<<"Unknown report!:"<<dec<<(int)buffer[0]<<endl;
+                        
+                        out<<"unknown report!:"<<dec<<(int)buffer[0]<<endl;
                         
                     }
                 
@@ -601,8 +598,7 @@ void * thread_core(void* param)
                     
                     pointer_callback(event);
                     
-                    if(common.debug)
-                        cout<<dec<<"pos: "<<mx<<","<<my<<endl;
+                    out<<dec<<"pos: "<<mx<<","<<my<<endl;
                 break;
                 
             }
@@ -640,15 +636,14 @@ void init_driver(driver_instance_info * info)
     unsigned char iface;
     unsigned char buffer[64];
     
-    if(common.debug)
-        cout<<"*** init_driver ***"<<endl;
+    
+    out<<"init driver"<<endl;
     
     iface = get_iface(info->id,supported_devices);
     build_path(info->address,iface,path);
     info->handle = hid_open_path(path);
     
-    if(common.debug)
-        cout<<"usb path:"<<path<<endl;
+    out<<"usb path:"<<path<<endl;
         
     if(info->handle==NULL)
     {
@@ -673,19 +668,19 @@ void init_driver(driver_instance_info * info)
                  * report id:8
                  * 	feature 8 bytes
                  */
-                cout<<"init: panaboard ub-t880"<<endl;
+                out<<"init: panaboard ub-t880"<<endl;
                 buffer[0]=8;
                 hid_get_feature_report(info->handle,buffer,8);
-                cout<<"Max Contact Number:"<<(int)buffer[1]<<endl;
+                out<<"Max Contact Number:"<<(int)buffer[1]<<endl;
                 
                 buffer[0]=4;
                 hid_get_feature_report(info->handle,buffer,8);
-                cout<<"Report ID 4"<<endl;
+                out<<"Report ID 4"<<endl;
                 for(int n=0;n<9;n++)
                 {
-                    cout<<hex<<(int)buffer[n]<<" ";
+                    clog<<hex<<(int)buffer[n]<<" ";
                 }
-                cout<<endl;
+                clog<<endl;
                 
                 buffer[0]=4;
                 buffer[1]=1;
@@ -749,8 +744,8 @@ void init_driver(driver_instance_info * info)
 */
 void close_driver(driver_instance_info * info)
 {
-    if(common.debug)
-        cout<<"*** close_driver ***"<<endl;
+    
+    out<<"close driver"<<endl;
     
     if(info->handle!=NULL)
     {
@@ -843,7 +838,7 @@ unsigned int get_status(unsigned int address)
 
 void set_callback( void(*callback)(driver_event) )
 {
-    if(common.debug)
-        cout<<"[WhiteBoardDriver] set_callback"<<endl;
+    
+    out<<"set_callback"<<endl;
     pointer_callback = callback;
 }

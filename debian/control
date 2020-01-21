@@ -1,0 +1,37 @@
+Source: mrpdi
+Section: kernel
+Priority: optional
+Maintainer: Enrique Medina Gremaldos <quiqueiii@gmail.com>
+Build-Depends: cdbs, debhelper (>= 7), cmake, make, g++, pkg-config, libx11-dev, libusb-1.0-0-dev, libxrandr-dev, libgtkmm-3.0-dev, libglibmm-2.4-dev, libconfig++-dev, libappindicator3-dev
+Standards-Version: 4.1.4
+
+Package: libmrpdi2
+Architecture: any
+Pre-Depends: multiarch-support
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: mrpdi core files
+ mrpdi core shared libraries
+
+Package: mrpdi-drivers
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
+Description: mrpdi main drivers
+ mrpdi main drivers including Smart, Multiclass, IQBoard and some tablets
+
+Package: libmrpdi-dev
+Architecture: any
+Depends: mrpdi-core (>=2.0)
+Description: mrpdi development files
+ Needed files to develop mrpdi drivers
+
+Package: mrpdi-cli
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
+Description: mrpdi cli
+ mrpdi command line tool
+
+Package: mrpdi-gui
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
+Description: mrpdi gui
+ mrpdi gtk ui

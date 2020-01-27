@@ -1,0 +1,5 @@
+usr/bin/mrpdi-gui   /usr/bin/
+usr/share/polkit-1/actions/lliurex.mrpdi.gui.policy    /usr/share/polkit-1/actions/
+var/lib/polkit-1/localauthority/10-vendor.d/lliurex.mrpdi.gui.pkla    /var/lib/polkit-1/localauthority/10-vendor.d/
+usr/share/applications/mrpdi.desktop /usr/share/applications/
+usr/share/icons/hicolor/scalable/apps/mrpdi.svg /usr/share/icons/hicolor/scalable/apps/

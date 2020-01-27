@@ -20,7 +20,7 @@ Description: mrpdi main drivers
 
 Package: libmrpdi-dev
 Architecture: any
-Depends: mrpdi-core (>=2.0)
+Depends: libmrpdi2
 Description: mrpdi development files
  Needed files to develop mrpdi drivers
 

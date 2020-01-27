@@ -7,7 +7,9 @@ Standards-Version: 4.1.4
 
 Package: libmrpdi2
 Architecture: any
-Pre-Depends: multiarch-support
+Conflicts: mrpdi-core
+Provides: mrpdi-core
+Replaces: mrpdi-core
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: mrpdi core files
  mrpdi core shared libraries
@@ -15,12 +17,18 @@ Description: mrpdi core files
 Package: mrpdi-drivers
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
+Conflicts: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
+Provides: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
+Conflicts: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
 Description: mrpdi main drivers
  mrpdi main drivers including Smart, Multiclass, IQBoard and some tablets
 
 Package: libmrpdi-dev
 Architecture: any
 Depends: libmrpdi2
+Conflicts: mrpdi-dev
+Provides: mrpdi-dev
+Replaces: mrpdi-dev
 Description: mrpdi development files
  Needed files to develop mrpdi drivers
 

@@ -1,0 +1,153 @@
+mrpdi (2.8.0.0) bionic; urgency=medium
+
+  * Moved build to cmake
+  * Better (but far from perfect) console output
+  * minor code fixes
+  * changed package names to better fit debian policy
+
+ -- Enrique Medina Gremaldos <quiqueiii@gmail.com>  Mon, 27 Jan 2020 11:56:03 +0100
+
+mrpdi (2.7.1) bionic; urgency=medium
+
+  * Update standards version
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Thu, 04 Oct 2018 09:40:34 +0200
+
+mrpdi (2.7) bionic; urgency=medium
+
+  * Bionic release
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Thu, 04 Oct 2018 09:08:57 +0200
+
+mrpdi (2.6) xenial; urgency=medium
+
+  * Ported trusty code to xenial
+
+ -- M.Angel Juan <m.angel.juan@gmail.com>  Mon, 08 Feb 2016 19:05:07 +0100
+
+mrpdi (2.3) trusty; urgency=high
+
+  * Added for Trusty 
+
+ -- Angel Berlanas Vicente <angel.berlanas@gmail.com>  Fri, 05 Jun 2015 12:08:02 +0200
+
+mrpdi (2.2) precise; urgency=low
+
+  * Added support for load/save device params and calibration settings
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Tue, 17 Sep 2013 11:52:58 +0200
+
+mrpdi (2.2~beta1) precise; urgency=low
+
+  * Added support for load/save calibration settings
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Mon, 09 Sep 2013 11:24:54 +0200
+
+mrpdi (2.1.6) precise; urgency=low
+
+  * Added pkg-config as build dep, this may solve undefined references with mrpdi-cli and gui
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Thu, 06 Jun 2013 13:34:13 +0200
+
+mrpdi (2.1.5) precise; urgency=low
+
+  * Trying to fix rules file (using 3.0 format)
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Wed, 29 May 2013 12:36:37 +0200
+
+mrpdi (2.1.4) precise; urgency=low
+
+  * Trying to fix rules file 
+
+ -- Raul Rodrigo Segura <raurodse@gmail.com>  Tue, 28 May 2013 09:33:22 +0200
+
+mrpdi (2.1.3ubuntu1) precise; urgency=high
+
+  * Dummy upgrade
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Tue, 28 May 2013 08:19:26 +0200
+
+mrpdi (2.1.3) precise; urgency=high
+
+  * Added xrandr as build depend
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Tue, 28 May 2013 07:58:08 +0200
+
+mrpdi (2.1.2) precise; urgency=low
+
+  * Added libusb as build depend
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Mon, 27 May 2013 08:49:53 +0200
+
+mrpdi (2.1.1) precise; urgency=low
+
+  * Package fixes. Fits better with debian policy
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Fri, 24 May 2013 12:14:29 +0200
+
+mrpdi (2.1) precise; urgency=low
+
+  * Added support for amd64 and i386 package-config 
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Thu, 23 May 2013 10:23:31 +0200
+
+mrpdi (2.1~alpha) precise; urgency=low
+
+  * Imported from leia
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Wed, 15 May 2013 10:25:04 +0200
+
+mrpdi (2.0.1) unstable; urgency=low
+
+  * Fixed multi-monitor detection routine, it was getting wrong settings on some laptops
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Thu, 21 Feb 2013 10:16:04 +0100
+
+mrpdi (2.0+beta1) unstable; urgency=low
+
+  * Switched to beta
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Thu, 17 Jan 2013 17:03:03 +0100
+
+mrpdi (2.0~alpha1) unstable; urgency=low
+
+  * mrpdi has been splitted into several packages, this one belongs to mrpdi-core and dev
+  * Drivers no longer manage input device, instead, they pass messages down to core
+  * Added a default input handler with the classic behaviour
+  * Now It is possible to add a custom input handler
+  * Improved calibration screen
+  * mrpdi shared lib no longer depends on libusb
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Wed, 21 Nov 2012 10:17:53 +0100
+
+mrpdi (1.0~beta2) unstable; urgency=low
+
+  * Mrpdi gui desktop
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Tue, 26 Jun 2012 13:58:53 +0200
+
+mrpdi (1.0~beta1) unstable; urgency=low
+
+  * Working auto cli mode with calibration support
+  * This commit renders the project feature complete for 1.0 release
+  * lacking some extensive testing
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Fri, 22 Jun 2012 11:40:31 +0200
+
+mrpdi (0.9~alpha) unstable; urgency=low
+
+  * Added right button for stylus
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Thu, 14 Jun 2012 11:35:00 +0200
+
+mrpdi (0.2) unstable; urgency=low
+
+  * Added gui localization
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Thu, 07 Jun 2012 13:06:25 +0200
+
+mrpdi (0.1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Enrique Medina Gremaldos <lliurex_devel4@edu.gva.es>  Wed, 23 May 2012 11:29:51 +0200

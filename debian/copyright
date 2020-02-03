@@ -1,7 +1,7 @@
 Format: http://dep.debian.net/deps/dep5
 Upstream-Name: lliurex-team 
 
-Files=*
+Files: *
 Copyright: 2020 Enrique Medina Gremaldos <quiqueiii@gmail.com>
 License: GPL-3.0+
 

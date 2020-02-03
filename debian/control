@@ -16,7 +16,7 @@ Description: mrpdi core files
 
 Package: mrpdi-drivers
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2 (= ${binary:Version})
 Conflicts: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
 Provides: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
 Replaces: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
@@ -25,7 +25,7 @@ Description: mrpdi main drivers
 
 Package: libmrpdi-dev
 Architecture: any
-Depends: libmrpdi2 (= ${binary:Version})
+Depends: libmrpdi2 (= ${binary:Version}), ${misc:Depends}
 Conflicts: mrpdi-dev
 Provides: mrpdi-dev
 Replaces: mrpdi-dev
@@ -34,12 +34,12 @@ Description: mrpdi development files
 
 Package: mrpdi-cli
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2 (= ${binary:Version})
 Description: mrpdi cli
  mrpdi command line tool
 
 Package: mrpdi-gui
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2 (= ${binary:Version})
 Description: mrpdi gui
  mrpdi gtk ui

@@ -19,7 +19,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libmrpdi2
 Conflicts: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
 Provides: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
-Conflicts: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
+Replaces: mrpdi-drivers-main, mrpdi-drivers-iqboard, mrpdi-drivers-multiclass
 Description: mrpdi main drivers
  mrpdi main drivers including Smart, Multiclass, IQBoard and some tablets
 
